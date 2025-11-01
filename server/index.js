@@ -3,19 +3,14 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-// --- Import API Handlers (for Amazon/Flipkart) ---
-const { searchAmazonApi } = require("./services/amazonApi.js");
-const { searchFlipkartApi } = require("./services/flipkartApi.js");
-
-// --- Import all 6 Scraper Handlers ---
+// Import ALL scrapers
 const { searchAmazonScraper } = require("./services/amazonScraper.js");
 const { searchFlipkartScraper } = require("./services/flipkartScraper.js");
 const { searchMyntraScraper } = require("./services/myntraScraper.js");
 const { searchAjioScraper } = require("./services/ajioScraper.js");
 const { searchNykaaScraper } = require("./services/nykaaScraper.js");
 const { searchMeeshoScraper } = require("./services/meeshoScraper.js");
-
-// --- Import AI Service ---
+const { searchGoogleShopping } = require("./services/googleShoppingScraper.js");
 const { getGeminiSummary } = require("./services/geminiService.js");
 
 const app = express();
@@ -24,29 +19,16 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// --- Helper: Sort results by price (Unchanged) ---
-function sortResultsByPrice(results) {
-  return results.sort((a, b) => {
-    const priceA = parseFloat(a.price.replace(/[^0-9.]/g, ""));
-    const priceB = parseFloat(b.price.replace(/[^0-9.]/g, ""));
-    return priceA - priceB;
-  });
-}
-
-// --- Helper: Parse price range from query (This one is correct) ---
+// Helper: Parse price range from query
 function parsePriceRange(query) {
   let minPrice = null;
   let maxPrice = null;
 
   let match = query.match(/(under|below)\s*rs?\.?\s*(\d+)/i);
-  if (match) {
-    maxPrice = parseFloat(match[2]);
-  }
+  if (match) maxPrice = parseFloat(match[2]);
 
   match = query.match(/(above|over)\s*rs?\.?\s*(\d+)/i);
-  if (match) {
-    minPrice = parseFloat(match[2]);
-  }
+  if (match) minPrice = parseFloat(match[2]);
 
   match = query.match(
     /(between|from)\s*rs?\.?\s*(\d+)\s*(and|to)\s*rs?\.?\s*(\d+)/i
@@ -56,127 +38,150 @@ function parsePriceRange(query) {
     maxPrice = parseFloat(match[4]);
   }
 
-  console.log(`Price range parsed: min=${minPrice}, max=${maxPrice}`);
   return { minPrice, maxPrice };
 }
 
-// --- Helper: API-first fallback logic (FIXED) ---
-// I've added priceRange as an argument here
-async function searchStoreWithApi(
-  query,
-  priceRange,
-  storeName,
-  apiSearchFn,
-  scraperSearchFn
-) {
-  try {
-    const apiResults = await apiSearchFn(query);
-    if (apiResults.length > 0) {
-      console.log(`Success: Found ${storeName} results via official API.`);
-      return apiResults;
-    }
+// Helper: Deduplicate results by title similarity
+function deduplicateResults(results) {
+  const unique = [];
+  const seenTitles = new Set();
 
-    console.log(`Fallback: ${storeName} API failed or empty, trying scraper.`);
-    // And I've passed priceRange to the scraper function call
-    return await scraperSearchFn(query, priceRange);
-  } catch (error) {
-    console.error(`Error in ${storeName} search logic:`, error.message);
-    return [];
+  for (const result of results) {
+    const normalizedTitle = result.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "")
+      .substring(0, 50);
+
+    if (!seenTitles.has(normalizedTitle)) {
+      seenTitles.add(normalizedTitle);
+      unique.push(result);
+    }
   }
+
+  return unique;
 }
 
-// --- Main Search Route (FIXED) ---
+// Main Search Route with improved orchestration
 app.get("/api/search", async (req, res) => {
   const { q } = req.query;
   if (!q) {
     return res.status(400).json({ error: 'Search query "q" is required.' });
   }
-  console.log(`Search query received: ${q}`);
 
-  // Price range is correctly parsed here
+  console.log(`\n${"=".repeat(60)}`);
+  console.log(`🔍 NEW SEARCH: "${q}"`);
+  console.log(`${"=".repeat(60)}\n`);
+
   const priceRange = parsePriceRange(q);
+  if (priceRange.minPrice || priceRange.maxPrice) {
+    console.log(
+      `💰 Price filter: ₹${priceRange.minPrice || 0} - ₹${
+        priceRange.maxPrice || "∞"
+      }`
+    );
+  }
 
   try {
-    console.log("Calling orchestrator for all 6 sites...");
+    const startTime = Date.now();
 
-    const searchPromises = [
-      // --- FIX: Pass priceRange to searchStoreWithApi ---
-      searchStoreWithApi(
-        q,
-        priceRange,
-        "Amazon",
-        searchAmazonApi,
-        searchAmazonScraper
-      ).catch((e) => {
-        console.error("Amazon main search failed:", e.message);
+    // Strategy 1: Try all stores in parallel
+    console.log("\n📦 Phase 1: Searching major stores...");
+    const storePromises = [
+      searchAmazonScraper(q, priceRange).catch((e) => {
+        console.error("❌ Amazon failed:", e.message);
         return [];
       }),
-
-      searchStoreWithApi(
-        q,
-        priceRange,
-        "Flipkart",
-        searchFlipkartApi,
-        searchFlipkartScraper
-      ).catch((e) => {
-        console.error("Flipkart main search failed:", e.message);
+      searchFlipkartScraper(q, priceRange).catch((e) => {
+        console.error("❌ Flipkart failed:", e.message);
         return [];
       }),
-
-      // --- FIX: Pass priceRange to all direct scraper calls ---
       searchMyntraScraper(q, priceRange).catch((e) => {
-        console.error("Myntra search failed:", e.message);
+        console.error("❌ Myntra failed:", e.message);
         return [];
       }),
-
       searchAjioScraper(q, priceRange).catch((e) => {
-        console.error("Ajio search failed:", e.message);
-        return [];
-      }),
-
-      searchNykaaScraper(q, priceRange).catch((e) => {
-        console.error("Nykaa search failed:", e.message);
-        return [];
-      }),
-
-      searchMeeshoScraper(q, priceRange).catch((e) => {
-        console.error("Meesho search failed:", e.message);
+        console.error("❌ Ajio failed:", e.message);
         return [];
       }),
     ];
 
-    const resultsArray = await Promise.all(searchPromises);
-    const allScrapeResults = resultsArray.flat();
+    const storeResults = await Promise.all(storePromises);
+    let allResults = storeResults.flat();
 
-    if (allScrapeResults.length === 0) {
-      console.log("Scraping found no results from any source.");
+    console.log(`\n📊 Phase 1 Results: ${allResults.length} products found`);
+    storeResults.forEach((results, i) => {
+      const stores = ["Amazon", "Flipkart", "Myntra", "Ajio"];
+      console.log(`   ${stores[i]}: ${results.length} products`);
+    });
+
+    // Strategy 2: If few results, try Google Shopping as backup
+    if (allResults.length < 3) {
+      console.log("\n🔄 Phase 2: Searching Google Shopping (backup)...");
+      const googleResults = await searchGoogleShopping(q, priceRange).catch(
+        (e) => {
+          console.error("❌ Google Shopping failed:", e.message);
+          return [];
+        }
+      );
+
+      if (googleResults.length > 0) {
+        console.log(`✅ Google Shopping: ${googleResults.length} products`);
+        allResults = [...allResults, ...googleResults];
+      }
+    }
+
+    if (allResults.length === 0) {
+      console.log("\n⚠️  No results found from any source");
       return res.json([]);
     }
 
-    console.log(`Success: Found ${allScrapeResults.length} total results.`);
-    const sortedResults = sortResultsByPrice(allScrapeResults);
-    res.json(sortedResults);
+    // Deduplicate and sort
+    const uniqueResults = deduplicateResults(allResults);
+    const sortedResults = uniqueResults.sort(
+      (a, b) => parseFloat(a.price) - parseFloat(b.price)
+    );
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+
+    console.log(`\n✅ SEARCH COMPLETE`);
+    console.log(`   Total: ${sortedResults.length} unique products`);
+    console.log(`   Time: ${elapsed}s`);
+    console.log(
+      `   Price range: ₹${sortedResults[0]?.price} - ₹${
+        sortedResults[sortedResults.length - 1]?.price
+      }`
+    );
+    console.log(`${"=".repeat(60)}\n`);
+
+    res.json(sortedResults.slice(0, 20)); // Return top 20
   } catch (error) {
-    console.error("Error in main search route:", error);
+    console.error("\n❌ SEARCH ERROR:", error);
     res.status(500).json({ error: "Failed to fetch search results." });
   }
 });
 
-// --- AI Summary Route (Unchanged) ---
+// AI Summary Route
 app.post("/api/summarize", async (req, res) => {
   const { results } = req.body;
   if (!results || results.length === 0) {
     return res.status(400).json({ error: "No results provided to summarize." });
   }
+
   try {
     const summary = await getGeminiSummary(results);
-    res.json({ summary: summary });
+    res.json({ summary });
   } catch (error) {
     console.error("Error getting Gemini summary:", error);
-    res.status(500).json({ error: "Failed to get summary." });
+
+    // Fallback summary
+    const cheapest = results[0];
+    const fallback = `The best deal is ${cheapest.title} on ${cheapest.source} for ₹${cheapest.price}. I found ${results.length} products in total.`;
+    res.json({ summary: fallback });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`\n🚀 Deal Finder Server Started`);
+  console.log(`📍 http://localhost:${PORT}`);
+  console.log(`${"=".repeat(60)}\n`);
 });

@@ -1,66 +1,85 @@
-// server/services/ajioScraper.js
-const axios = require("axios");
-const cheerio = require("cheerio");
+const axios3 = require("axios");
+const cheerio3 = require("cheerio");
 require("dotenv").config();
 
-const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
+const SCRAPER_API_KEY3 = process.env.SCRAPER_API_KEY;
 
 async function searchAjioScraper(query, priceRange) {
-  if (!SCRAPER_API_KEY) {
+  if (!SCRAPER_API_KEY3) {
     console.error("ScraperAPI key not found.");
     return [];
   }
+
   const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
   const targetUrl = `https://www.ajio.com/search/?text=${searchQuery}`;
-  const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}`;
+  const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY3}&url=${targetUrl}&render=true`;
 
   console.log("Scraping Ajio via ScraperAPI...");
 
   try {
-    const { data } = await axios.get(API_URL);
-    const $ = cheerio.load(data);
+    const { data } = await axios3.get(API_URL, { timeout: 30000 });
+    const $ = cheerio3.load(data);
     const results = [];
 
-    // --- NEW CARD SELECTOR based on your HTML ---
-    const productCards = $("div.item.product-card-container");
-    console.log(`Found ${productCards.length} potential Ajio product cards.`);
+    // Multiple card selectors
+    let productCards = $("div.item.product-card-container");
+    if (productCards.length === 0) productCards = $("div.item");
+    if (productCards.length === 0)
+      productCards = $(".rilrtl-products-list__item");
+
+    console.log(`Found ${productCards.length} Ajio product cards.`);
 
     productCards.each((i, el) => {
+      if (results.length >= 5) return false;
+
       const $el = $(el);
-      // Inner selectors are correct
-      const brand = $el.find("div.brand").text();
-      const title = $el.find("div.nameCls").text();
-      const price = $el.find("span.price").first().text();
-      const url =
-        "https://www.ajio.com" +
-        $el.find("a.product-link").first().attr("href");
-      const imageUrl = $el.find("img.product-image").first().attr("src");
+
+      // Title
+      const brand = $el.find("div.brand").text().trim();
+      const name = $el.find("div.nameCls").text().trim();
+      let title = `${brand} ${name}`.trim();
+      if (!title) title = $el.find(".name").text().trim();
+
+      // Price
+      let price = $el.find("span.price").first().text();
+      if (!price) price = $el.find(".price-value").first().text();
+
+      // URL
+      let url = $el.find("a.product-link").first().attr("href");
+      if (!url) url = $el.find("a").first().attr("href");
+      if (url && !url.startsWith("http")) {
+        url = "https://www.ajio.com" + url;
+      }
+
+      // Image
+      let imageUrl = $el.find("img.product-image").first().attr("src");
+      if (!imageUrl) imageUrl = $el.find("img").first().attr("src");
 
       const cleanedPrice = price.replace(/[^0-9.]/g, "");
-      const fullTitle = `${brand} ${title}`;
 
-      if (fullTitle && cleanedPrice && url && imageUrl) {
-        // Price filtering
+      if (title && cleanedPrice && url) {
         const priceNum = parseFloat(cleanedPrice);
+
         if (priceRange.minPrice && priceNum < priceRange.minPrice) return;
         if (priceRange.maxPrice && priceNum > priceRange.maxPrice) return;
+        if (priceNum < 1 || priceNum > 1000000) return;
 
         results.push({
           source: "Ajio",
-          title: fullTitle.trim(),
+          title: title.substring(0, 100),
           price: cleanedPrice,
           url: url,
-          imageUrl: imageUrl || "https://via.placeholder.com/150",
+          imageUrl: imageUrl || "https://via.placeholder.com/150?text=Ajio",
         });
       }
-
-      if (results.length >= 5) return false;
     });
+
     console.log(`Found ${results.length} valid results from Ajio.`);
     return results;
   } catch (error) {
-    console.error("Ajio Scraping Error (via ScraperAPI):", error.message);
+    console.error("Ajio Scraping Error:", error.message);
     return [];
   }
 }
+
 module.exports = { searchAjioScraper };
