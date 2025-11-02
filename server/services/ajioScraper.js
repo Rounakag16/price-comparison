@@ -1,24 +1,25 @@
-const axios3 = require("axios");
-const cheerio3 = require("cheerio");
+// server/services/ajioScraper.js
+const axios = require("axios");
+const cheerio = require("cheerio");
 require("dotenv").config();
 
-const SCRAPER_API_KEY3 = process.env.SCRAPER_API_KEY;
+const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
 
 async function searchAjioScraper(query, priceRange) {
-  if (!SCRAPER_API_KEY3) {
+  if (!SCRAPER_API_KEY) {
     console.error("ScraperAPI key not found.");
     return [];
   }
 
   const searchQuery = encodeURIComponent(query).replace(/%20/g, "+");
   const targetUrl = `https://www.ajio.com/search/?text=${searchQuery}`;
-  const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY3}&url=${targetUrl}&render=true`;
+  const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}&render=true`;
 
   console.log("Scraping Ajio via ScraperAPI...");
 
   try {
-    const { data } = await axios3.get(API_URL, { timeout: 30000 });
-    const $ = cheerio3.load(data);
+    const { data } = await axios.get(API_URL, { timeout: 60000 }); // Fixed: 30s → 60s
+    const $ = cheerio.load(data);
     const results = [];
 
     // Multiple card selectors

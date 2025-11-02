@@ -1,9 +1,9 @@
-// server/index.js
+// server/index.js - With Google Shopping Always Enabled
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-// Import ALL scrapers
+// Import ALL scrapers + Google Shopping
 const { searchAmazonScraper } = require("./services/amazonScraper.js");
 const { searchFlipkartScraper } = require("./services/flipkartScraper.js");
 const { searchMyntraScraper } = require("./services/myntraScraper.js");
@@ -61,16 +61,16 @@ function deduplicateResults(results) {
   return unique;
 }
 
-// Main Search Route with improved orchestration
+// Main Search Route
 app.get("/api/search", async (req, res) => {
   const { q } = req.query;
   if (!q) {
     return res.status(400).json({ error: 'Search query "q" is required.' });
   }
 
-  console.log(`\n${"=".repeat(60)}`);
+  console.log(`\n${"=".repeat(70)}`);
   console.log(`🔍 NEW SEARCH: "${q}"`);
-  console.log(`${"=".repeat(60)}\n`);
+  console.log(`${"=".repeat(70)}\n`);
 
   const priceRange = parsePriceRange(q);
   if (priceRange.minPrice || priceRange.maxPrice) {
@@ -84,8 +84,8 @@ app.get("/api/search", async (req, res) => {
   try {
     const startTime = Date.now();
 
-    // Strategy 1: Try all stores in parallel
-    console.log("\n📦 Phase 1: Searching major stores...");
+    // Phase 1: Search direct stores + Google Shopping in parallel
+    console.log("\n📦 Phase 1: Searching all sources in parallel...");
     const storePromises = [
       searchAmazonScraper(q, priceRange).catch((e) => {
         console.error("❌ Amazon failed:", e.message);
@@ -103,32 +103,89 @@ app.get("/api/search", async (req, res) => {
         console.error("❌ Ajio failed:", e.message);
         return [];
       }),
+      searchNykaaScraper(q, priceRange).catch((e) => {
+        console.error("❌ Nykaa failed:", e.message);
+        return [];
+      }),
+      searchMeeshoScraper(q, priceRange).catch((e) => {
+        console.error("❌ Meesho failed:", e.message);
+        return [];
+      }),
+      // ✨ ALWAYS search Google Shopping (runs in parallel)
+      searchGoogleShopping(q, priceRange).catch((e) => {
+        console.error("❌ Google Shopping failed:", e.message);
+        return [];
+      }),
     ];
 
     const storeResults = await Promise.all(storePromises);
     let allResults = storeResults.flat();
 
-    console.log(`\n📊 Phase 1 Results: ${allResults.length} products found`);
+    // Enhanced comparison table with Google Shopping
+    console.log(`\n${"=".repeat(70)}`);
+    console.log(`📊 STORE COMPARISON RESULTS`);
+    console.log(`${"=".repeat(70)}`);
+    console.log(
+      `${"Store".padEnd(15)} | ${"Status".padEnd(10)} | ${"Found".padEnd(
+        8
+      )} | ${"Price Range"}`
+    );
+    console.log(`${"-".repeat(70)}`);
+
+    const stores = [
+      "Amazon",
+      "Flipkart",
+      "Myntra",
+      "Ajio",
+      "Nykaa",
+      "Meesho",
+      "Google Shop", // Added Google Shopping to the list
+    ];
+
     storeResults.forEach((results, i) => {
-      const stores = ["Amazon", "Flipkart", "Myntra", "Ajio"];
-      console.log(`   ${stores[i]}: ${results.length} products`);
-    });
+      const status = results.length > 0 ? "✅ Success" : "❌ No Data";
+      const count = results.length.toString().padEnd(8);
 
-    // Strategy 2: If few results, try Google Shopping as backup
-    if (allResults.length < 3) {
-      console.log("\n🔄 Phase 2: Searching Google Shopping (backup)...");
-      const googleResults = await searchGoogleShopping(q, priceRange).catch(
-        (e) => {
-          console.error("❌ Google Shopping failed:", e.message);
-          return [];
-        }
-      );
-
-      if (googleResults.length > 0) {
-        console.log(`✅ Google Shopping: ${googleResults.length} products`);
-        allResults = [...allResults, ...googleResults];
+      let priceRangeStr = "-";
+      if (results.length > 0) {
+        const prices = results.map((r) => parseFloat(r.price));
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        priceRangeStr = `₹${min} - ₹${max}`;
       }
+
+      console.log(
+        `${stores[i].padEnd(15)} | ${status.padEnd(
+          10
+        )} | ${count} | ${priceRangeStr}`
+      );
+    });
+    console.log(`${"=".repeat(70)}\n`);
+
+    // Calculate statistics
+    const totalProducts = allResults.length;
+    const successfulStores = storeResults.filter((r) => r.length > 0).length;
+    const failedStores = stores.length - successfulStores;
+
+    console.log(`📈 Statistics:`);
+    console.log(`   Total Products Found: ${totalProducts}`);
+    console.log(`   Successful Stores: ${successfulStores}/${stores.length}`);
+    console.log(`   Failed Stores: ${failedStores}`);
+
+    if (totalProducts > 0) {
+      const allPrices = allResults.map((r) => parseFloat(r.price));
+      const avgPrice = (
+        allPrices.reduce((a, b) => a + b, 0) / allPrices.length
+      ).toFixed(2);
+      console.log(`   Average Price: ₹${avgPrice}`);
+      console.log(`   Lowest Price: ₹${Math.min(...allPrices)}`);
+      console.log(`   Highest Price: ₹${Math.max(...allPrices)}`);
+
+      // Show which stores contributed
+      const contributing = stores.filter((_, i) => storeResults[i].length > 0);
+      console.log(`   Sources: ${contributing.join(", ")}`);
     }
+    console.log();
 
     if (allResults.length === 0) {
       console.log("\n⚠️  No results found from any source");
@@ -145,15 +202,18 @@ app.get("/api/search", async (req, res) => {
 
     console.log(`\n✅ SEARCH COMPLETE`);
     console.log(`   Total: ${sortedResults.length} unique products`);
+    console.log(
+      `   Duplicates removed: ${allResults.length - sortedResults.length}`
+    );
     console.log(`   Time: ${elapsed}s`);
     console.log(
       `   Price range: ₹${sortedResults[0]?.price} - ₹${
         sortedResults[sortedResults.length - 1]?.price
       }`
     );
-    console.log(`${"=".repeat(60)}\n`);
+    console.log(`${"=".repeat(70)}\n`);
 
-    res.json(sortedResults.slice(0, 20)); // Return top 20
+    res.json(sortedResults.slice(0, 30)); // Return top 30 (increased from 20)
   } catch (error) {
     console.error("\n❌ SEARCH ERROR:", error);
     res.status(500).json({ error: "Failed to fetch search results." });
@@ -183,5 +243,6 @@ app.post("/api/summarize", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`\n🚀 Deal Finder Server Started`);
   console.log(`📍 http://localhost:${PORT}`);
-  console.log(`${"=".repeat(60)}\n`);
+  console.log(`💡 Tip: Google Shopping now runs on every search!`);
+  console.log(`${"=".repeat(70)}\n`);
 });

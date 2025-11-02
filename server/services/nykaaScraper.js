@@ -17,7 +17,7 @@ async function searchNykaaScraper(query, priceRange) {
   console.log("Scraping Nykaa via ScraperAPI...");
 
   try {
-    const { data } = await axios4.get(API_URL, { timeout: 30000 });
+    const { data } = await axios4.get(API_URL, { timeout: 60000 }); // Increased to 60s
     const $ = cheerio4.load(data);
     const results = [];
 
