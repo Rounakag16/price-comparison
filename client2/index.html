@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealFinder - Find the Best Deals in Seconds</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Landing Page -->
+    <div
+      id="landing-page"
+      class="min-h-screen bg-black text-white overflow-hidden hidden"
+    >
+      <!-- Animated Background Elements -->
+      <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div
+          class="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"
+        ></div>
+        <div
+          class="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
+          style="animation-delay: 1s"
+        ></div>
+        <div
+          class="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse"
+          style="animation-delay: 2s"
+        ></div>
+      </div>
+
+      <!-- Navigation -->
+      <nav
+        id="landing-nav"
+        class="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80"
+      >
+        <div class="max-w-7xl mx-auto px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3 group cursor-pointer">
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center transform group-hover:rotate-12 transition-transform duration-300"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  ></path>
+                </svg>
+              </div>
+              <span
+                class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent"
+              >
+                DealFinder
+              </span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-8">
+              <a
+                href="#features"
+                class="text-gray-300 hover:text-white text-sm font-medium transition-colors relative group"
+              >
+                Features
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"
+                ></span>
+              </a>
+              <a
+                href="#how-it-works"
+                class="text-gray-300 hover:text-white text-sm font-medium transition-colors relative group"
+              >
+                How it works
+                <span
+                  class="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300"
+                ></span>
+              </a>
+              <button
+                class="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50"
+              >
+                Get Started
+              </button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2">
+              <svg
+                id="menu-icon"
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+              <svg
+                id="close-icon"
+                class="w-6 h-6 hidden"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mobile Menu -->
+          <div id="mobile-menu" class="md:hidden mt-4 pb-4 space-y-3 hidden">
+            <a
+              href="#features"
+              class="block text-gray-300 hover:text-white py-2"
+              >Features</a
+            >
+            <a
+              href="#how-it-works"
+              class="block text-gray-300 hover:text-white py-2"
+              >How it works</a
+            >
+            <button
+              class="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-all"
+            >
+              Get Started
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <main class="relative pt-32 pb-20 px-6">
+        <div class="max-w-5xl mx-auto text-center">
+          <!-- Badge -->
+          <div
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm font-medium mb-8 animate-fade-in backdrop-blur-sm"
+          >
+            <svg
+              class="w-4 h-4 animate-pulse"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+              ></path>
+            </svg>
+            Smart Shopping Assistant
+          </div>
+
+          <!-- Headline -->
+          <h1
+            class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in-up"
+          >
+            Find the Best
+            <span
+              class="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent animate-gradient"
+              >Deals</span
+            >
+            in Seconds
+          </h1>
+
+          <!-- Subheadline -->
+          <p
+            class="text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up"
+            style="animation-delay: 0.2s"
+          >
+            Compare prices across Amazon, Flipkart, and more. Get voice-powered
+            search and AI-driven recommendations instantly.
+          </p>
+
+          <!-- Search Bar -->
+          <form
+            id="landing-search-form"
+            class="mb-10 animate-fade-in-up"
+            style="animation-delay: 0.4s"
+          >
+            <div class="relative max-w-3xl mx-auto group">
+              <div
+                class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity"
+              ></div>
+              <div
+                class="relative flex items-center bg-gray-900/80 backdrop-blur-xl border border-gray-800 rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-blue-500/50 group-hover:shadow-lg group-hover:shadow-blue-500/20"
+              >
+                <svg
+                  class="w-5 h-5 text-gray-400 ml-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  ></path>
+                </svg>
+                <input
+                  id="landing-search-input"
+                  type="text"
+                  placeholder="Search for products, brands, or categories..."
+                  class="flex-1 px-4 py-5 text-lg bg-transparent text-white placeholder-gray-500 focus:outline-none"
+                />
+                <div class="flex items-center gap-2 mr-2">
+                  <button
+                    id="landing-voice-search-btn"
+                    type="button"
+                    class="p-3 rounded-lg transition-all bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                    title="Voice search"
+                  >
+                    🎙️
+                  </button>
+                  <button
+                    type="submit"
+                    class="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 transition-all flex items-center gap-2"
+                  >
+                    Search
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <!-- Popular Searches -->
+          <div
+            class="flex flex-wrap justify-center gap-3 mb-16 animate-fade-in-up"
+            style="animation-delay: 0.6s"
+          >
+            <span class="text-sm text-gray-500">Popular:</span>
+            <button
+              class="popular-search-btn px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-800 text-sm text-gray-300 hover:border-blue-500 hover:text-blue-400 transition-all hover:shadow-md hover:shadow-blue-500/20 transform hover:scale-105"
+              data-query="Laptop under 50000"
+            >
+              Laptop under 50000
+            </button>
+            <button
+              class="popular-search-btn px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-800 text-sm text-gray-300 hover:border-blue-500 hover:text-blue-400 transition-all hover:shadow-md hover:shadow-blue-500/20 transform hover:scale-105"
+              data-query="Running shoes"
+            >
+              Running shoes
+            </button>
+            <button
+              class="popular-search-btn px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-800 text-sm text-gray-300 hover:border-blue-500 hover:text-blue-400 transition-all hover:shadow-md hover:shadow-blue-500/20 transform hover:scale-105"
+              data-query="Smartphone"
+            >
+              Smartphone
+            </button>
+            <button
+              class="popular-search-btn px-4 py-2 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-800 text-sm text-gray-300 hover:border-blue-500 hover:text-blue-400 transition-all hover:shadow-md hover:shadow-blue-500/20 transform hover:scale-105"
+              data-query="Headphones"
+            >
+              Headphones
+            </button>
+          </div>
+
+          <!-- Stats -->
+          <div
+            class="grid grid-cols-3 gap-8 max-w-3xl mx-auto mb-20 animate-fade-in-up"
+            style="animation-delay: 0.8s"
+          >
+            <div
+              class="text-center p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all transform hover:scale-105"
+            >
+              <div
+                class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2"
+              >
+                7+
+              </div>
+              <div class="text-sm text-gray-400">Online Stores</div>
+            </div>
+            <div
+              class="text-center p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all transform hover:scale-105"
+            >
+              <div
+                class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2"
+              >
+                1M+
+              </div>
+              <div class="text-sm text-gray-400">Products</div>
+            </div>
+            <div
+              class="text-center p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all transform hover:scale-105"
+            >
+              <div
+                class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-2"
+              >
+                60s
+              </div>
+              <div class="text-sm text-gray-400">Avg. Search</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Section -->
+        <div id="features" class="max-w-7xl mx-auto mt-32">
+          <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">
+            Why Choose
+            <span
+              class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent"
+              >DealFinder?</span
+            >
+          </h2>
+          <p class="text-gray-400 text-center mb-16 text-lg">
+            Powerful features to save you time and money
+          </p>
+
+          <div class="grid md:grid-cols-3 gap-8">
+            <div
+              class="group relative p-8 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-2"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+              <div
+                class="relative w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+              >
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="relative text-2xl font-bold mb-4">Smart Comparison</h3>
+              <p class="relative text-gray-400 leading-relaxed">
+                Automatically compares prices across major e-commerce platforms
+                to find you the best deal.
+              </p>
+            </div>
+
+            <div
+              class="group relative p-8 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-2"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+              <div
+                class="relative w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+              >
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="relative text-2xl font-bold mb-4">Voice Search</h3>
+              <p class="relative text-gray-400 leading-relaxed">
+                Search hands-free with voice commands and get spoken summaries
+                of the best deals.
+              </p>
+            </div>
+
+            <div
+              class="group relative p-8 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-2"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+              ></div>
+              <div
+                class="relative w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+              >
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 class="relative text-2xl font-bold mb-4">
+                AI Recommendations
+              </h3>
+              <p class="relative text-gray-400 leading-relaxed">
+                Get intelligent suggestions powered by Gemini AI to help you
+                make smarter purchase decisions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- How It Works -->
+        <div id="how-it-works" class="max-w-5xl mx-auto mt-32">
+          <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">
+            How It
+            <span
+              class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent"
+              >Works</span
+            >
+          </h2>
+          <p class="text-gray-400 text-center mb-16 text-lg">
+            Three simple steps to better deals
+          </p>
+
+          <div class="space-y-8">
+            <div
+              class="flex items-start gap-6 p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+            >
+              <div
+                class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform"
+              >
+                1
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <h3 class="text-2xl font-bold">Search for Any Product</h3>
+                </div>
+                <p class="text-gray-400 leading-relaxed">
+                  Type or speak what you're looking for. Support for price
+                  filters like 'under 5000'.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-6 p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+            >
+              <div
+                class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform"
+              >
+                2
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <h3 class="text-2xl font-bold">We Search Everywhere</h3>
+                </div>
+                <p class="text-gray-400 leading-relaxed">
+                  Our system scans Amazon, Flipkart, Myntra, Ajio, and more in
+                  real-time.
+                </p>
+              </div>
+            </div>
+
+            <div
+              class="flex items-start gap-6 p-6 rounded-2xl bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 transition-all hover:shadow-lg hover:shadow-blue-500/10 group"
+            >
+              <div
+                class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform"
+              >
+                3
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <div
+                    class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-400"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <h3 class="text-2xl font-bold">Compare & Save</h3>
+                </div>
+                <p class="text-gray-400 leading-relaxed">
+                  View results sorted by price with AI-powered summaries. Click
+                  to buy from your preferred store.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="max-w-5xl mx-auto mt-32">
+          <div
+            class="relative p-12 text-center rounded-3xl overflow-hidden group"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-blue-600 to-indigo-600 opacity-90 group-hover:opacity-100 transition-opacity"
+            ></div>
+            <div
+              class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjEiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-20"
+            ></div>
+            <div class="relative">
+              <h2 class="text-4xl md:text-5xl font-bold mb-4">
+                Ready to Find Better Deals?
+              </h2>
+              <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+                Start comparing prices now and never overpay again.
+              </p>
+              <button
+                id="cta-search-btn"
+                class="px-10 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all inline-flex items-center gap-3 group"
+              >
+                Start Searching
+                <svg
+                  class="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer
+        class="relative border-t border-gray-900 bg-black/50 backdrop-blur-sm mt-32"
+      >
+        <div class="max-w-7xl mx-auto px-6 py-12">
+          <div
+            class="flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
+              >
+                <svg
+                  class="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  ></path>
+                </svg>
+              </div>
+              <span class="font-bold text-xl">DealFinder</span>
+            </div>
+            <p class="text-gray-400 text-sm">
+              © 2025 DealFinder. Made with ❤️ for smart shoppers.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Search Page -->
+    <div id="search-page" class="min-h-screen bg-black text-white hidden">
+      <!-- Header -->
+      <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+          <div class="flex items-center gap-6">
+            <!-- Logo -->
+            <button
+              id="search-home-btn"
+              class="flex items-center gap-2 flex-shrink-0"
+            >
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center"
+              >
+                <span class="text-white font-bold text-lg">D</span>
+              </div>
+              <span
+                class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hidden md:block"
+              >
+                DealFinder
+              </span>
+            </button>
+
+            <!-- Search Bar -->
+            <div class="flex-1 relative">
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Search for products..."
+                class="w-full px-4 py-3 pr-24 rounded-xl bg-gray-900 border border-gray-800 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+              />
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                <button
+                  id="voice-search-btn"
+                  class="p-2 rounded-lg transition-all bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
+                >
+                  🎙️
+                </button>
+                <button
+                  id="search-btn"
+                  class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-20 hidden">
+          <div
+            class="inline-block w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"
+          ></div>
+          <p class="text-slate-600 text-lg">Searching across stores...</p>
+          <p class="text-gray-500 text-sm mt-2">
+            This may take up to 60 seconds
+          </p>
+        </div>
+
+        <!-- Results -->
+        <div id="results-container" class="hidden">
+          <!-- Results Header -->
+          <div
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6"
+          >
+            <div class="flex items-center gap-4">
+              <h2 id="results-count" class="text-2xl font-bold text-white">
+                0 Results
+              </h2>
+              <button
+                id="speak-summary-btn"
+                class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all flex items-center gap-2"
+              >
+                🔊 Hear Summary
+              </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex items-center gap-3">
+              <!-- Store Filter -->
+              <select
+                id="store-filter"
+                class="px-4 py-2 rounded-lg border border-gray-800 bg-gray-900 text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="all">All Stores</option>
+              </select>
+
+              <!-- Sort -->
+              <select
+                id="sort-filter"
+                class="px-4 py-2 rounded-lg border border-gray-800 bg-gray-900 text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Summary Display -->
+          <div id="summary-container" class="hidden mb-6">
+            <div
+              class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl border border-gray-800 p-6"
+            >
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <svg
+                    class="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    ></path>
+                  </svg>
+                  <h3 class="text-lg font-bold text-white">AI Summary</h3>
+                </div>
+                <button
+                  id="close-summary-btn"
+                  class="text-gray-400 hover:text-gray-300 transition-colors"
+                  title="Close summary"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+              <p id="summary-text" class="text-gray-300 leading-relaxed"></p>
+            </div>
+          </div>
+
+          <!-- Store Comparison Section -->
+          <div id="store-comparison" class="mb-8 hidden">
+            <h3 class="text-xl font-bold text-white mb-4">Store Comparison</h3>
+            <div
+              id="store-comparison-grid"
+              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            ></div>
+          </div>
+
+          <!-- Store Stats (Simple) -->
+          <div
+            id="store-stats"
+            class="bg-gray-900 rounded-xl border border-gray-800 p-4 mb-6 flex flex-wrap gap-4"
+          ></div>
+
+          <!-- Product Grid -->
+          <div
+            id="products-grid"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          ></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-20 hidden">
+          <div class="text-6xl mb-4">🔍</div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">
+            No results found
+          </h2>
+          <p class="text-slate-600 mb-6">
+            Try different keywords or check your spelling
+          </p>
+          <button
+            id="back-to-home-btn"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+          >
+            Back to Home
+          </button>
+        </div>
+
+        <!-- Initial State -->
+        <div id="initial-state" class="text-center py-20">
+          <div class="text-6xl mb-4">👋</div>
+          <h2 class="text-2xl font-bold text-white mb-2">Start Your Search</h2>
+          <p class="text-gray-400">
+            Enter a product name above to find the best deals
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="router.js"></script>
+    <script src="landing.js"></script>
+    <script src="search.js"></script>
+  </body>
+</html>
