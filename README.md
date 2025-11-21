@@ -1,9 +1,5 @@
 # 🛍️ DealFinder - Smart Price Comparison Platform
 
-![DealFinder Banner](https://img.shields.io/badge/DealFinder-Smart%20Shopping-blue?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-1.0.0-green?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-orange?style=for-the-badge)
-
 **DealFinder** is an intelligent price comparison platform that helps shoppers find the best deals across multiple e-commerce platforms in India. Using web scraping, AI-powered summaries, and voice search, it simplifies the shopping experience and saves users time and money.
 
 ---
@@ -429,32 +425,6 @@ Edit `server/services/geminiService.js` to customize:
 
 ---
 
-## 📜 License
-
-MIT License - See LICENSE file for details
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
----
-
-## 📧 Support
-
-- **Issues**: Open a GitHub issue
-- **Email**: your.email@example.com
-- **Documentation**: See `/docs` folder
-
----
-
 ## 👏 Acknowledgments
 
 - **ScraperAPI** - Web scraping infrastructure
@@ -464,15 +434,3 @@ Contributions welcome! Please follow these steps:
 - **All Contributors** - Thank you!
 
 ---
-
-## 📈 Stats
-
-![GitHub Stars](https://img.shields.io/github/stars/yourusername/dealfinder?style=social)
-![GitHub Forks](https://img.shields.io/github/forks/yourusername/dealfinder?style=social)
-![GitHub Issues](https://img.shields.io/github/issues/yourusername/dealfinder)
-
----
-
-**Made with ❤️ for smart shoppers**
-
-_Last Updated: November 2025_
