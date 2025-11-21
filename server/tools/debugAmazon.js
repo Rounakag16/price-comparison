@@ -17,13 +17,11 @@ async function debugAmazonSearch(query) {
   try {
     const { data } = await axios.get(API_URL, { timeout: 60000 });
 
-    // Save raw HTML for inspection
     fs.writeFileSync("amazon-debug.html", data);
     console.log("✅ Saved raw HTML to: amazon-debug.html\n");
 
     const $ = cheerio.load(data);
 
-    // Try different card selectors
     const selectors = [
       "div[data-component-type='s-search-result']",
       "div[data-asin]:not([data-asin=''])",
@@ -38,7 +36,6 @@ async function debugAmazonSearch(query) {
       console.log(`   ${sel.padEnd(50)} → ${count} cards`);
     });
 
-    // Pick the best selector
     let productCards = $("div[data-component-type='s-search-result']");
     if (productCards.length === 0) {
       productCards = $("div[data-asin]:not([data-asin=''])");
@@ -46,14 +43,12 @@ async function debugAmazonSearch(query) {
 
     console.log(`\n✅ Using selector with ${productCards.length} cards\n`);
 
-    // Debug first 3 cards in detail
     productCards.slice(0, 3).each((i, el) => {
       const $el = $(el);
       console.log(`${"=".repeat(70)}`);
       console.log(`CARD ${i + 1}:`);
       console.log(`${"=".repeat(70)}`);
 
-      // All possible title selectors
       const titleSelectors = [
         "h2 a span",
         "h2.a-size-mini a span",
@@ -71,7 +66,6 @@ async function debugAmazonSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${text.substring(0, 50)}`);
       });
 
-      // All possible price selectors
       const priceSelectors = [
         "span.a-price-whole",
         ".a-price .a-offscreen",
@@ -88,7 +82,6 @@ async function debugAmazonSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${text}`);
       });
 
-      // URL selectors
       const urlSelectors = ["h2 a", "a.a-link-normal", "a[href*='/dp/']", "a"];
 
       console.log("\n🔗 URL ATTEMPTS:");
@@ -100,7 +93,6 @@ async function debugAmazonSearch(query) {
         );
       });
 
-      // Image selectors
       const imgSelectors = ["img.s-image", "img[data-image-latency]", "img"];
 
       console.log("\n🖼️  IMAGE ATTEMPTS:");
@@ -110,7 +102,6 @@ async function debugAmazonSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${src?.substring(0, 50)}`);
       });
 
-      // Show full HTML of first card for manual inspection
       if (i === 0) {
         console.log("\n📄 FULL HTML (first 1000 chars):");
         console.log($el.html().substring(0, 1000));
@@ -128,6 +119,5 @@ async function debugAmazonSearch(query) {
   }
 }
 
-// Run the debug
 const query = process.argv[2] || "laptop";
 debugAmazonSearch(query);

@@ -1,10 +1,7 @@
-// Landing page functionality
-
 (function () {
   let scrollY = 0;
   let isMenuOpen = false;
 
-  // Initialize on DOM load
   document.addEventListener("DOMContentLoaded", () => {
     initScrollEffect();
     initMobileMenu();
@@ -15,7 +12,6 @@
     initLandingVoiceSearch();
   });
 
-  // Scroll effect for navigation
   function initScrollEffect() {
     const nav = document.getElementById("landing-nav");
 
@@ -41,10 +37,9 @@
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
   }
 
-  // Mobile menu toggle
   function initMobileMenu() {
     const menuBtn = document.getElementById("mobile-menu-btn");
     const mobileMenu = document.getElementById("mobile-menu");
@@ -66,8 +61,6 @@
         }
       });
     }
-
-    // Close menu when clicking on links
     const menuLinks = mobileMenu.querySelectorAll("a, button");
     menuLinks.forEach((link) => {
       link.addEventListener("click", () => {
@@ -79,7 +72,6 @@
     });
   }
 
-  // Search form handler
   function initSearchForm() {
     const form = document.getElementById("landing-search-form");
     const input = document.getElementById("landing-search-input");
@@ -89,7 +81,6 @@
         e.preventDefault();
         const query = input.value.trim();
         if (query) {
-          // Navigate to search page with query
           if (window.router) {
             window.router.navigateToSearch(query);
           } else {
@@ -100,7 +91,6 @@
     }
   }
 
-  // Popular searches
   function initPopularSearches() {
     const popularBtns = document.querySelectorAll(".popular-search-btn");
     const searchInput = document.getElementById("landing-search-input");
@@ -111,8 +101,6 @@
         if (searchInput) {
           searchInput.value = query;
           searchInput.focus();
-
-          // Auto-submit after a brief moment
           setTimeout(() => {
             if (window.router) {
               window.router.navigateToSearch(query);
@@ -125,7 +113,6 @@
     });
   }
 
-  // CTA button
   function initCTA() {
     const ctaBtn = document.getElementById("cta-search-btn");
     const searchInput = document.getElementById("landing-search-input");
@@ -134,14 +121,12 @@
       ctaBtn.addEventListener("click", () => {
         if (searchInput) {
           searchInput.focus();
-          // Scroll to search input
           searchInput.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       });
     }
   }
 
-  // Smooth scroll for anchor links
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener("click", function (e) {
@@ -157,7 +142,6 @@
     });
   }
 
-  // Landing page voice search
   function initLandingVoiceSearch() {
     const btn = document.getElementById("landing-voice-search-btn");
     let recognition = null;
@@ -192,7 +176,6 @@
           if (searchInput) {
             searchInput.value = transcript;
             searchInput.focus();
-            // Don't auto-search - user needs to click search button
           }
         };
 

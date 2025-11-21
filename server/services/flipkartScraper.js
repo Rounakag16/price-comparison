@@ -1,5 +1,4 @@
-// server/services/flipkartScraper.js
-const axios = require("axios"); // <-- 1. ADDED AXIOS IMPORT
+const axios = require("axios");
 const cheerio = require("cheerio");
 require("dotenv").config();
 
@@ -12,8 +11,6 @@ async function searchFlipkartScraper(query, priceRange) {
   }
   const searchQuery = encodeURIComponent(query);
   const targetUrl = `https://www.flipkart.com/search?q=${searchQuery}`;
-
-  // 2. MOVED API_URL DEFINITION OUTSIDE THE TRY BLOCK
   const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}`;
 
   console.log("Scraping Flipkart via ScraperAPI...");
@@ -23,7 +20,6 @@ async function searchFlipkartScraper(query, priceRange) {
     const $ = cheerio.load(data);
     const results = [];
 
-    // Selectors from our last working version
     const productCards = $("div.hCKiGj");
     console.log(
       `Found ${productCards.length} potential Flipkart product cards.`
@@ -39,7 +35,6 @@ async function searchFlipkartScraper(query, priceRange) {
       const cleanedPrice = price.replace(/[^0-9.]/g, "");
 
       if (title && cleanedPrice && url && imageUrl) {
-        // Price filtering logic (this is correct)
         const priceNum = parseFloat(cleanedPrice);
         if (priceRange.minPrice && priceNum < priceRange.minPrice) {
           return;

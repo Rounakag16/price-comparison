@@ -1,14 +1,9 @@
-// server/services/googleShoppingScraper.js
 const axios = require("axios");
 const cheerio = require("cheerio");
 require("dotenv").config();
 
 const SCRAPER_API_KEY = process.env.SCRAPER_API_KEY;
 
-/**
- * Scrapes Google Shopping results as a fallback
- * This is more reliable as Google aggregates results from multiple stores
- */
 async function searchGoogleShopping(query, priceRange) {
   if (!SCRAPER_API_KEY) {
     console.error("ScraperAPI key not found.");
@@ -26,12 +21,11 @@ async function searchGoogleShopping(query, priceRange) {
     const $ = cheerio.load(data);
     const results = [];
 
-    // Google Shopping product cards
     const productCards = $("div.sh-dgr__content");
     console.log(`Found ${productCards.length} Google Shopping results.`);
 
     productCards.each((i, el) => {
-      if (results.length >= 10) return false; // Get more from Google
+      if (results.length >= 10) return false;
 
       const $el = $(el);
 
@@ -56,7 +50,6 @@ async function searchGoogleShopping(query, priceRange) {
         const cleanedPrice = price.replace(/[^0-9.]/g, "");
         const priceNum = parseFloat(cleanedPrice);
 
-        // Filter by price range
         if (priceRange.minPrice && priceNum < priceRange.minPrice) return;
         if (priceRange.maxPrice && priceNum > priceRange.maxPrice) return;
         if (priceNum < 1 || priceNum > 1000000) return;

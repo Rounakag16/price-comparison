@@ -1,6 +1,3 @@
-// server/tools/quickTest.js
-// Run with: node server/tools/quickTest.js
-
 require("dotenv").config();
 
 const { searchAmazonScraper } = require("../services/amazonScraper.js");
@@ -18,7 +15,6 @@ async function quickTest() {
   console.log(`Price Range: under ₹2000\n`);
   console.log("=".repeat(70));
 
-  // Test each scraper one by one
   const tests = [
     { name: "Amazon", fn: searchAmazonScraper },
     { name: "Flipkart", fn: searchFlipkartScraper },

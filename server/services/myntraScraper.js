@@ -1,5 +1,3 @@
-// server/services/myntraScraper.js
-// Simplified version - Remove render=true as it might be causing issues
 const axios = require("axios");
 const cheerio = require("cheerio");
 require("dotenv").config();
@@ -15,7 +13,6 @@ async function searchMyntraScraper(query, priceRange) {
   const searchQuery = encodeURIComponent(query).replace(/%20/g, "-");
   const targetUrl = `https://www.myntra.com/${searchQuery}`;
 
-  // Try WITHOUT render=true first (faster, sometimes more reliable)
   const API_URL = `http://api.scraperapi.com?api_key=${SCRAPER_API_KEY}&url=${targetUrl}`;
 
   console.log("Scraping Myntra via ScraperAPI...");
@@ -25,7 +22,6 @@ async function searchMyntraScraper(query, priceRange) {
     const $ = cheerio.load(data);
     const results = [];
 
-    // Try multiple card selectors
     let productCards = $("li.product-base");
     if (productCards.length === 0) productCards = $("li.product-tile");
     if (productCards.length === 0) productCards = $("li[class*='product']");
@@ -44,7 +40,6 @@ async function searchMyntraScraper(query, priceRange) {
 
       const $el = $(el);
 
-      // Try multiple ways to get title
       let title = "";
       const brand =
         $el.find("h3.product-brand").text().trim() ||
@@ -64,7 +59,6 @@ async function searchMyntraScraper(query, priceRange) {
         title = productName;
       }
 
-      // Try multiple ways to get price
       let price = $el
         .find("span.product-discountedPrice")
         .first()
@@ -75,20 +69,17 @@ async function searchMyntraScraper(query, priceRange) {
         price = $el.find("span[class*='price']").first().text().trim();
       if (!price) price = $el.find(".price").first().text().trim();
 
-      // URL
       let url = $el.find("a").first().attr("href");
       if (url && !url.startsWith("http")) {
         url = "https://www.myntra.com" + url;
       }
 
-      // Image
       let imageUrl =
         $el.find("img").first().attr("src") ||
         $el.find("img").first().attr("data-src");
 
       const cleanedPrice = price.replace(/[^0-9.]/g, "");
 
-      // Debug first card only
       if (i === 0) {
         console.log(`\n  Myntra Card 1 Debug:`);
         console.log(`    Brand: ${brand ? "✓" : "✗"} ${brand}`);

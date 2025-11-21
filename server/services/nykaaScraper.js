@@ -17,11 +17,10 @@ async function searchNykaaScraper(query, priceRange) {
   console.log("Scraping Nykaa via ScraperAPI...");
 
   try {
-    const { data } = await axios4.get(API_URL, { timeout: 60000 }); // Increased to 60s
+    const { data } = await axios4.get(API_URL, { timeout: 60000 });
     const $ = cheerio4.load(data);
     const results = [];
 
-    // Multiple selectors
     let productCards = $("div[class*='product']");
     if (productCards.length === 0) productCards = $("div.productCard");
     if (productCards.length === 0) productCards = $(".css-11GgB6i");
@@ -33,24 +32,20 @@ async function searchNykaaScraper(query, priceRange) {
 
       const $el = $(el);
 
-      // Title
       let title = $el.find("div.css-10j9e4h").text().trim();
       if (!title) title = $el.find(".product-title").text().trim();
       if (!title) title = $el.find("h3").text().trim();
 
-      // Price
       let price = $el.find("span.css-11d0vru").first().text();
       if (!price) price = $el.find(".product-price").first().text();
       if (!price) price = $el.find("span[class*='price']").first().text();
 
-      // URL
       let url = $el.find("a.css-qlopj4").first().attr("href");
       if (!url) url = $el.find("a").first().attr("href");
       if (url && !url.startsWith("http")) {
         url = "https://www.nykaa.com" + url;
       }
 
-      // Image
       let imageUrl = $el.find("img.css-1Nq0w4o").first().attr("src");
       if (!imageUrl) imageUrl = $el.find("img").first().attr("src");
 

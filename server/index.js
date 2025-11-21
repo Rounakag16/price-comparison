@@ -1,9 +1,7 @@
-// server/index.js - With Google Shopping Always Enabled
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-// Import ALL scrapers + Google Shopping
 const { searchAmazonScraper } = require("./services/amazonScraper.js");
 const { searchFlipkartScraper } = require("./services/flipkartScraper.js");
 const { searchMyntraScraper } = require("./services/myntraScraper.js");
@@ -19,7 +17,6 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Helper: Parse price range from query
 function parsePriceRange(query) {
   let minPrice = null;
   let maxPrice = null;
@@ -41,7 +38,6 @@ function parsePriceRange(query) {
   return { minPrice, maxPrice };
 }
 
-// Helper: Deduplicate results by title similarity
 function deduplicateResults(results) {
   const unique = [];
   const seenTitles = new Set();
@@ -61,7 +57,6 @@ function deduplicateResults(results) {
   return unique;
 }
 
-// Main Search Route
 app.get("/api/search", async (req, res) => {
   const { q } = req.query;
   if (!q) {
@@ -83,8 +78,6 @@ app.get("/api/search", async (req, res) => {
 
   try {
     const startTime = Date.now();
-
-    // Phase 1: Search direct stores + Google Shopping in parallel
     console.log("\n📦 Phase 1: Searching all sources in parallel...");
     const storePromises = [
       searchAmazonScraper(q, priceRange).catch((e) => {
@@ -111,7 +104,6 @@ app.get("/api/search", async (req, res) => {
         console.error("❌ Meesho failed:", e.message);
         return [];
       }),
-      // ✨ ALWAYS search Google Shopping (runs in parallel)
       searchGoogleShopping(q, priceRange).catch((e) => {
         console.error("❌ Google Shopping failed:", e.message);
         return [];
@@ -121,7 +113,6 @@ app.get("/api/search", async (req, res) => {
     const storeResults = await Promise.all(storePromises);
     let allResults = storeResults.flat();
 
-    // Enhanced comparison table with Google Shopping
     console.log(`\n${"=".repeat(70)}`);
     console.log(`📊 STORE COMPARISON RESULTS`);
     console.log(`${"=".repeat(70)}`);
@@ -139,7 +130,7 @@ app.get("/api/search", async (req, res) => {
       "Ajio",
       "Nykaa",
       "Meesho",
-      "Google Shop", // Added Google Shopping to the list
+      "Google Shop",
     ];
 
     storeResults.forEach((results, i) => {
@@ -162,7 +153,6 @@ app.get("/api/search", async (req, res) => {
     });
     console.log(`${"=".repeat(70)}\n`);
 
-    // Calculate statistics
     const totalProducts = allResults.length;
     const successfulStores = storeResults.filter((r) => r.length > 0).length;
     const failedStores = stores.length - successfulStores;
@@ -181,7 +171,6 @@ app.get("/api/search", async (req, res) => {
       console.log(`   Lowest Price: ₹${Math.min(...allPrices)}`);
       console.log(`   Highest Price: ₹${Math.max(...allPrices)}`);
 
-      // Show which stores contributed
       const contributing = stores.filter((_, i) => storeResults[i].length > 0);
       console.log(`   Sources: ${contributing.join(", ")}`);
     }
@@ -192,7 +181,6 @@ app.get("/api/search", async (req, res) => {
       return res.json([]);
     }
 
-    // Deduplicate and sort
     const uniqueResults = deduplicateResults(allResults);
     const sortedResults = uniqueResults.sort(
       (a, b) => parseFloat(a.price) - parseFloat(b.price)
@@ -213,14 +201,13 @@ app.get("/api/search", async (req, res) => {
     );
     console.log(`${"=".repeat(70)}\n`);
 
-    res.json(sortedResults.slice(0, 30)); // Return top 30 (increased from 20)
+    res.json(sortedResults.slice(0, 30));
   } catch (error) {
     console.error("\n❌ SEARCH ERROR:", error);
     res.status(500).json({ error: "Failed to fetch search results." });
   }
 });
 
-// AI Summary Route
 app.post("/api/summarize", async (req, res) => {
   const { results } = req.body;
   if (!results || results.length === 0) {
@@ -233,7 +220,6 @@ app.post("/api/summarize", async (req, res) => {
   } catch (error) {
     console.error("Error getting Gemini summary:", error);
 
-    // Fallback summary
     const cheapest = results[0];
     const fallback = `The best deal is ${cheapest.title} on ${cheapest.source} for ₹${cheapest.price}. I found ${results.length} products in total.`;
     res.json({ summary: fallback });

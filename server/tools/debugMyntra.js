@@ -1,6 +1,3 @@
-// Save as: server/tools/debugMyntra.js
-// Run with: node server/tools/debugMyntra.js "shirt"
-
 const axios = require("axios");
 const cheerio = require("cheerio");
 const fs = require("fs");
@@ -20,13 +17,11 @@ async function debugMyntraSearch(query) {
   try {
     const { data } = await axios.get(API_URL, { timeout: 60000 });
 
-    // Save raw HTML for inspection
     fs.writeFileSync("myntra-debug.html", data);
     console.log("✅ Saved raw HTML to: myntra-debug.html\n");
 
     const $ = cheerio.load(data);
 
-    // Try different card selectors
     const cardSelectors = [
       "li.product-base",
       "li.product-tile",
@@ -41,20 +36,17 @@ async function debugMyntraSearch(query) {
       console.log(`   ${sel.padEnd(40)} → ${count} cards`);
     });
 
-    // Pick the best selector
     let productCards = $("li.product-base");
     if (productCards.length === 0) productCards = $("li.product-tile");
 
     console.log(`\n✅ Using selector with ${productCards.length} cards\n`);
 
-    // Debug first 3 cards in detail
     productCards.slice(0, 3).each((i, el) => {
       const $el = $(el);
       console.log(`${"=".repeat(70)}`);
       console.log(`CARD ${i + 1}:`);
       console.log(`${"=".repeat(70)}`);
 
-      // Brand selectors
       const brandSelectors = [
         "h3.product-brand",
         ".product-brand",
@@ -69,7 +61,6 @@ async function debugMyntraSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${text.substring(0, 50)}`);
       });
 
-      // Product name selectors
       const nameSelectors = [
         "h4.product-product",
         ".product-product",
@@ -84,7 +75,6 @@ async function debugMyntraSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${text.substring(0, 50)}`);
       });
 
-      // Price selectors
       const priceSelectors = [
         "span.product-discountedPrice",
         "div.product-price",
@@ -100,7 +90,6 @@ async function debugMyntraSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${text}`);
       });
 
-      // URL selectors
       const urlSelectors = ["a", "a.product-link", "[href]"];
 
       console.log("\n🔗 URL ATTEMPTS:");
@@ -112,7 +101,6 @@ async function debugMyntraSearch(query) {
         );
       });
 
-      // Image selectors
       const imgSelectors = ["img.product-image", "img.img-responsive", "img"];
 
       console.log("\n🖼️  IMAGE ATTEMPTS:");
@@ -122,7 +110,6 @@ async function debugMyntraSearch(query) {
         console.log(`   ${found} ${sel.padEnd(35)} → ${src?.substring(0, 50)}`);
       });
 
-      // Show full HTML of first card
       if (i === 0) {
         console.log("\n📄 FULL HTML (first 1000 chars):");
         console.log($el.html().substring(0, 1000));
@@ -140,6 +127,5 @@ async function debugMyntraSearch(query) {
   }
 }
 
-// Run the debug
 const query = process.argv[2] || "shirt";
 debugMyntraSearch(query);

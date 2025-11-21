@@ -18,11 +18,10 @@ async function searchAjioScraper(query, priceRange) {
   console.log("Scraping Ajio via ScraperAPI...");
 
   try {
-    const { data } = await axios.get(API_URL, { timeout: 60000 }); // Fixed: 30s → 60s
+    const { data } = await axios.get(API_URL, { timeout: 60000 });
     const $ = cheerio.load(data);
     const results = [];
 
-    // Multiple card selectors
     let productCards = $("div.item.product-card-container");
     if (productCards.length === 0) productCards = $("div.item");
     if (productCards.length === 0)

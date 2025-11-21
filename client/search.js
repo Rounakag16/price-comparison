@@ -1,5 +1,3 @@
-// Search page functionality
-
 (function () {
   let results = [];
   let sortBy = "price-low";
@@ -8,7 +6,6 @@
 
   const API_BASE = "http://localhost:3001";
 
-  // Initialize on DOM load
   document.addEventListener("DOMContentLoaded", () => {
     initSearchInput();
     initSearchButton();
@@ -17,11 +14,9 @@
     initNavigation();
     initSpeakSummary();
 
-    // Check if there's a query in URL
     checkURLQuery();
   });
 
-  // Check URL for query parameter
   function checkURLQuery() {
     const params = new URLSearchParams(window.location.search);
     const query = params.get("q");
@@ -34,7 +29,6 @@
     }
   }
 
-  // Global function for router to call
   window.handleSearchFromRouter = function (query) {
     const searchInput = document.getElementById("search-input");
     if (searchInput) {
@@ -43,7 +37,6 @@
     handleSearch(query);
   };
 
-  // Search input handler
   function initSearchInput() {
     const input = document.getElementById("search-input");
     if (input) {
@@ -55,7 +48,6 @@
     }
   }
 
-  // Search button handler
   function initSearchButton() {
     const btn = document.getElementById("search-btn");
     if (btn) {
@@ -63,13 +55,11 @@
     }
   }
 
-  // Perform search
   function performSearch() {
     const input = document.getElementById("search-input");
     const query = input ? input.value.trim() : "";
 
     if (query) {
-      // Update URL
       const url = `/search?q=${encodeURIComponent(query)}`;
       window.history.pushState({}, "", url);
 
@@ -77,7 +67,6 @@
     }
   }
 
-  // Handle search API call
   async function handleSearch(query) {
     if (!query.trim()) return;
 
@@ -104,7 +93,6 @@
     }
   }
 
-  // Voice search
   function initVoiceSearch() {
     const btn = document.getElementById("voice-search-btn");
 
@@ -140,7 +128,6 @@
           if (searchInput) {
             searchInput.value = transcript;
             searchInput.focus();
-            // Don't auto-search - user needs to click search button
           }
         };
 
@@ -156,7 +143,6 @@
     });
   }
 
-  // Initialize filters
   function initFilters() {
     const sortFilter = document.getElementById("sort-filter");
     const storeFilter = document.getElementById("store-filter");
@@ -176,14 +162,12 @@
     }
   }
 
-  // Display results
   function displayResults() {
     if (results.length === 0) {
       showEmptyState();
       return;
     }
 
-    // Sort results
     const sortedResults = [...results].sort((a, b) => {
       if (sortBy === "price-low") {
         return parseFloat(a.price) - parseFloat(b.price);
@@ -194,7 +178,6 @@
       return 0;
     });
 
-    // Filter results
     const filteredResults =
       filterStore === "all"
         ? sortedResults
@@ -202,25 +185,18 @@
             (r) => r.source.toLowerCase() === filterStore.toLowerCase()
           );
 
-    // Update results count
     const countEl = document.getElementById("results-count");
     if (countEl) {
       countEl.textContent = `${filteredResults.length} Results`;
     }
-
-    // Update store filter options
     updateStoreFilter();
 
-    // Update store stats
     updateStoreStats();
 
-    // Update store comparison
     updateStoreComparison();
 
-    // Render products
     renderProducts(filteredResults);
 
-    // Show results container
     const loadingState = document.getElementById("loading-state");
     const resultsContainer = document.getElementById("results-container");
     const emptyState = document.getElementById("empty-state");
@@ -232,7 +208,6 @@
     if (resultsContainer) resultsContainer.classList.remove("hidden");
   }
 
-  // Update store filter dropdown
   function updateStoreFilter() {
     const storeFilter = document.getElementById("store-filter");
     if (!storeFilter) return;
@@ -240,10 +215,8 @@
     const uniqueStores = [...new Set(results.map((r) => r.source))];
     const currentValue = storeFilter.value;
 
-    // Clear existing options except "All Stores"
     storeFilter.innerHTML = '<option value="all">All Stores</option>';
 
-    // Add store options
     uniqueStores.forEach((store) => {
       const option = document.createElement("option");
       option.value = store.toLowerCase();
@@ -251,11 +224,9 @@
       storeFilter.appendChild(option);
     });
 
-    // Restore selection
     storeFilter.value = currentValue;
   }
 
-  // Update store stats
   function updateStoreStats() {
     const statsEl = document.getElementById("store-stats");
     if (!statsEl) return;
@@ -275,7 +246,6 @@
     });
   }
 
-  // Update store comparison with detailed stats
   function updateStoreComparison() {
     const comparisonEl = document.getElementById("store-comparison");
     const comparisonGrid = document.getElementById("store-comparison-grid");
@@ -290,7 +260,6 @@
 
     const uniqueStores = [...new Set(results.map((r) => r.source))];
 
-    // Calculate stats for each store
     const storeStats = uniqueStores.map((store) => {
       const storeResults = results.filter((r) => r.source === store);
       const prices = storeResults
@@ -314,10 +283,8 @@
       };
     });
 
-    // Sort by product count (descending)
     storeStats.sort((a, b) => b.count - a.count);
 
-    // Find overall best deal
     const allPrices = results
       .map((r) => parseFloat(r.price))
       .filter((p) => !isNaN(p));
@@ -326,7 +293,6 @@
       (s) => s.minPrice === overallMinPrice
     );
 
-    // Render comparison cards
     storeStats.forEach((stat) => {
       const card = document.createElement("div");
       card.className =
@@ -383,7 +349,6 @@
     });
   }
 
-  // Render products
   function renderProducts(products) {
     const grid = document.getElementById("products-grid");
     if (!grid) return;
@@ -396,7 +361,6 @@
     });
   }
 
-  // Create product card element
   function createProductCard(product) {
     const card = document.createElement("div");
     card.className =
@@ -440,7 +404,6 @@
     return card;
   }
 
-  // Show loading state
   function showLoading() {
     const loadingState = document.getElementById("loading-state");
     const resultsContainer = document.getElementById("results-container");
@@ -453,13 +416,11 @@
     if (initialState) initialState.classList.add("hidden");
   }
 
-  // Hide loading state
   function hideLoading() {
     const loadingState = document.getElementById("loading-state");
     if (loadingState) loadingState.classList.add("hidden");
   }
 
-  // Show empty state
   function showEmptyState() {
     const loadingState = document.getElementById("loading-state");
     const resultsContainer = document.getElementById("results-container");
@@ -472,7 +433,6 @@
     if (initialState) initialState.classList.add("hidden");
   }
 
-  // Show error
   function showError(message) {
     showEmptyState();
     const emptyState = document.getElementById("empty-state");
@@ -482,7 +442,6 @@
     }
   }
 
-  // Navigation
   function initNavigation() {
     const homeBtn = document.getElementById("search-home-btn");
     const backBtn = document.getElementById("back-to-home-btn");
@@ -508,7 +467,6 @@
     }
   }
 
-  // Speak summary
   function initSpeakSummary() {
     const btn = document.getElementById("speak-summary-btn");
     const summaryContainer = document.getElementById("summary-container");
@@ -517,7 +475,6 @@
 
     if (!btn) return;
 
-    // Close summary button
     if (closeSummaryBtn && summaryContainer) {
       closeSummaryBtn.addEventListener("click", () => {
         summaryContainer.classList.add("hidden");
@@ -540,13 +497,11 @@
         const data = await response.json();
         const summary = data.summary || "No summary available.";
 
-        // Display summary text
         if (summaryText && summaryContainer) {
           summaryText.textContent = summary;
           summaryContainer.classList.remove("hidden");
         }
 
-        // Speak summary
         const utterance = new SpeechSynthesisUtterance(summary);
         utterance.lang = "en-US";
         window.speechSynthesis.speak(utterance);
@@ -562,7 +517,6 @@
     });
   }
 
-  // Utility: Escape HTML
   function escapeHtml(text) {
     const div = document.createElement("div");
     div.textContent = text;

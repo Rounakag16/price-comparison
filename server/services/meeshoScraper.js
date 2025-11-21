@@ -17,11 +17,10 @@ async function searchMeeshoScraper(query, priceRange) {
   console.log("Scraping Meesho via ScraperAPI...");
 
   try {
-    const { data } = await axios5.get(API_URL, { timeout: 60000 }); // Increased to 60s
+    const { data } = await axios5.get(API_URL, { timeout: 60000 });
     const $ = cheerio5.load(data);
     const results = [];
 
-    // Try to parse JSON from __NEXT_DATA__ script tag
     const scriptData = $('script[id="__NEXT_DATA__"]').html();
 
     if (scriptData) {
